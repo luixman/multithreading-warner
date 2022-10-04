@@ -88,7 +88,7 @@ public class MyThreadPoolExecutor extends ThreadPoolExecutor {
         public void remove(Runnable r) {
             Node current = threads.get(r);
             if (current.isWarned) {
-               printTimeOfClosedWarnThread(current);
+                PrintClosedThread(current);
             }
             threads.remove(r);
         }
@@ -102,7 +102,7 @@ public class MyThreadPoolExecutor extends ThreadPoolExecutor {
             log.warn(String.format("%s execution takes too long: %02d:%02d:%02d", node.threadName, hours, minutes, seconds));
         }
 
-        private void printTimeOfClosedWarnThread(Node node){
+        private void PrintClosedThread(Node node){
             long workTime = new Date().getTime() - node.startTime.getTime();
             int seconds = (int) (workTime / 1000) % 60;
             int minutes = (int) ((workTime / (1000 * 60)) % 60);

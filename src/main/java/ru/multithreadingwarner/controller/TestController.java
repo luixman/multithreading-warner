@@ -23,7 +23,9 @@ public class TestController {
     @PostConstruct
     public void init() throws Exception{
 
-        ExecutorService ex = new MyThreadPoolExecutor(3, 5);
+        ExecutorService ex = new MyThreadPoolExecutor(3, 5,TimeUnit.SECONDS);
+
+
 
 
         List<Task> tasks = new ArrayList<>();

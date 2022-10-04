@@ -12,15 +12,13 @@ import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
-import java.util.logging.Logger;
+
 
 @RestController
 @EnableWebMvc
 @Slf4j
-//@Log4j
 public class TestController {
 
-    //private static Logger log = Logger.getLogger(TestController.class.getName());
 
     @PostConstruct
     public void init() throws Exception{
@@ -36,13 +34,8 @@ public class TestController {
             ex.submit(c);
         }
 
-
         Thread.sleep(20000);
         ex.shutdown();
-
-
-
-
 
 
     }

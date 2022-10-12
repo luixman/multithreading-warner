@@ -8,13 +8,13 @@ import java.util.Map;
 import java.util.concurrent.*;
 
 @Slf4j
-public class MyThreadPoolExecutor extends ThreadPoolExecutor {
+public class ThreadPoolExecutorTimeSpy extends ThreadPoolExecutor {
     private final ThreadsController controller;
 
-    public MyThreadPoolExecutor(int nThread, int warnTime, TimeUnit timeUnitForWarnTime) {//если надо, то реализовать TimeUnit Для варнов
+    public ThreadPoolExecutorTimeSpy(int nThread, int warnTime, TimeUnit timeUnitForWarnTime) {//если надо, то реализовать TimeUnit Для варнов
         super(nThread, nThread, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
 
-        controller = new MyThreadPoolExecutor.ThreadsController(warnTime, timeUnitForWarnTime);
+        controller = new ThreadPoolExecutorTimeSpy.ThreadsController(warnTime, timeUnitForWarnTime);
         controller.start();
         //сюда можно добавить лог старта задачи
     }
@@ -93,6 +93,7 @@ public class MyThreadPoolExecutor extends ThreadPoolExecutor {
             threads.remove(r);
         }
 
+
         private void printWarn(Node node) {
             long workTime = new Date().getTime() - node.startTime.getTime();
             int seconds = (int) (workTime / 1000) % 60;
@@ -112,10 +113,8 @@ public class MyThreadPoolExecutor extends ThreadPoolExecutor {
 
         }
         private static class Node {
-
             String threadName;
             Date startTime;
-
             boolean isWarned;
 
             public Node(String threadName, Date startTime) {

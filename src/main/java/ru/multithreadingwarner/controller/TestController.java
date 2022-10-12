@@ -2,11 +2,12 @@ package ru.multithreadingwarner.controller;
 
 import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import ru.multithreadingwarner.service.MyThreadPoolExecutor;
 import ru.multithreadingwarner.service.Task;
+import ru.multithreadingwarner.service.ThreadPoolExecutorTimeSpy;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
@@ -23,9 +24,7 @@ public class TestController {
     @PostConstruct
     public void init() throws Exception{
 
-        ExecutorService ex = new MyThreadPoolExecutor(3, 5,TimeUnit.SECONDS);
-
-
+        ExecutorService ex = new ThreadPoolExecutorTimeSpy(3, 5,TimeUnit.SECONDS);
 
 
         List<Task> tasks = new ArrayList<>();
@@ -41,4 +40,6 @@ public class TestController {
 
 
     }
+
+
 }

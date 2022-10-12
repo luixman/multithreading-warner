@@ -2,9 +2,7 @@ package ru.multithreadingwarner.service;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.*;
 

@@ -1,6 +1,6 @@
 package ru.multithreadingwarner.service;
 
-import java.util.concurrent.Callable;
+
 
 public class Task implements Runnable {
     @Override

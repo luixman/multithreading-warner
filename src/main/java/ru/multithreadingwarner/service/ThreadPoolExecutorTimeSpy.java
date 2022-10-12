@@ -3,6 +3,7 @@ package ru.multithreadingwarner.service;
 import lombok.extern.slf4j.Slf4j;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -11,12 +12,12 @@ import java.util.concurrent.*;
 public class ThreadPoolExecutorTimeSpy extends ThreadPoolExecutor {
     private final ThreadsController controller;
 
-    public ThreadPoolExecutorTimeSpy(int nThread, int warnTime, TimeUnit timeUnitForWarnTime) {//если надо, то реализовать TimeUnit Для варнов
+    public ThreadPoolExecutorTimeSpy(int nThread, int warnTime, TimeUnit timeUnitForWarnTime) {
         super(nThread, nThread, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
 
         controller = new ThreadPoolExecutorTimeSpy.ThreadsController(warnTime, timeUnitForWarnTime);
         controller.start();
-        //сюда можно добавить лог старта задачи
+
     }
 
     protected void beforeExecute(Thread t, Runnable r) {
@@ -39,10 +40,10 @@ public class ThreadPoolExecutorTimeSpy extends ThreadPoolExecutor {
 
     private static class ThreadsController extends Thread {
         private final Map<Runnable, Node> threads = new ConcurrentHashMap();
-        private final Long warnTime;
+        private final Long warnTime; //в секундах
 
         public ThreadsController(int warnTime, TimeUnit timeUnitForWarnTime) {
-            this.warnTime = timeUnitForWarnTime.toMillis(warnTime);
+            this.warnTime = timeUnitForWarnTime.toSeconds(warnTime);
 
 
         }
@@ -58,11 +59,12 @@ public class ThreadPoolExecutorTimeSpy extends ThreadPoolExecutor {
                         long timeWait = warnTime;
 
                         for (Map.Entry<Runnable, Node> t : threads.entrySet()) {
-                            long now = new Date().getTime();
-                            if (now - t.getValue().startTime.getTime() < warnTime) {
-                                if (now - t.getValue().startTime.getTime() < timeWait)
+                            // long now = new Date().getTime();
+                            long now = Instant.now().getEpochSecond();
+                            if (now - t.getValue().startTime.getEpochSecond() < warnTime) {
+                                if (now - t.getValue().startTime.getEpochSecond() < timeWait)
                                     //Если прошло меньше времени, чем в варн тайм, то считаем минимальное время для сна
-                                    timeWait = warnTime - (now - t.getValue().startTime.getTime());
+                                    timeWait = warnTime - (now - t.getValue().startTime.getEpochSecond());
                             } else {
                                 if (!t.getValue().isWarned) {
                                     t.getValue().isWarned = true;
@@ -80,7 +82,7 @@ public class ThreadPoolExecutorTimeSpy extends ThreadPoolExecutor {
         }
 
         public void add(Runnable r, String threadName) {
-            Node node = new Node(threadName, new Date());
+            Node node = new Node(threadName, Instant.now());
             threads.put(r, node);
 
         }
@@ -95,29 +97,32 @@ public class ThreadPoolExecutorTimeSpy extends ThreadPoolExecutor {
 
 
         private void printWarn(Node node) {
-            long workTime = new Date().getTime() - node.startTime.getTime();
-            int seconds = (int) (workTime / 1000) % 60;
-            int minutes = (int) ((workTime / (1000 * 60)) % 60);
-            int hours = (int) ((workTime / (1000 * 60 * 60)) % 24);
+            // long workTime = new Date().getTime() - node.startTime.getTime();
+            long workTime = Instant.now().minusSeconds(node.startTime.getEpochSecond()).getEpochSecond();
+            int seconds = (int) (workTime) % 60;
+            int minutes = (int) ((workTime / 60) % 60);
+            int hours = (int) ((workTime / (60 * 60)) % 24);
 
             log.warn(String.format("%s execution takes too long: %02d:%02d:%02d", node.threadName, hours, minutes, seconds));
         }
 
-        private void PrintClosedThread(Node node){
-            long workTime = new Date().getTime() - node.startTime.getTime();
-            int seconds = (int) (workTime / 1000) % 60;
-            int minutes = (int) ((workTime / (1000 * 60)) % 60);
-            int hours = (int) ((workTime / (1000 * 60 * 60)) % 24);
+        private void PrintClosedThread(Node node) {
+            long workTime = Instant.now().minusSeconds(node.startTime.getEpochSecond()).getEpochSecond();
+            // long workTime = new Date().getTime() - node.startTime.getTime();
+            int seconds = (int) (workTime) % 60;
+            int minutes = (int) ((workTime / 60) % 60);
+            int hours = (int) ((workTime / (60 * 60)) % 24);
 
-            log.info(String.format("%s is ended: %02d:%02d:%02d",node.threadName, hours, minutes, seconds));
+            log.info(String.format("%s is ended: %02d:%02d:%02d", node.threadName, hours, minutes, seconds));
 
         }
+
         private static class Node {
             String threadName;
-            Date startTime;
+            Instant startTime;
             boolean isWarned;
 
-            public Node(String threadName, Date startTime) {
+            public Node(String threadName, Instant startTime) {
                 this.threadName = threadName;
                 this.startTime = startTime;
             }

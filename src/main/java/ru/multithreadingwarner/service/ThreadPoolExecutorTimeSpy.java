@@ -55,6 +55,7 @@ public class ThreadPoolExecutorTimeSpy extends ThreadPoolExecutor {
                         sleep(warnTime);
                     } else {
                         long timeWait = warnTime;
+                        System.out.println(timeWait);
 
                         for (Map.Entry<Runnable, Node> t : threads.entrySet()) {
                             // long now = new Date().getTime();
@@ -71,7 +72,7 @@ public class ThreadPoolExecutorTimeSpy extends ThreadPoolExecutor {
                                 }
                             }
                         }
-                        sleep(timeWait);
+                        sleep(timeWait*1000);
                     }
                 }
             } catch (InterruptedException e) {

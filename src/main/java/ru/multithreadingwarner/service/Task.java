@@ -7,7 +7,7 @@ public class Task implements Runnable {
     public void run() {
 
         try {
-            Thread.sleep(15000);
+            Thread.sleep(12000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
